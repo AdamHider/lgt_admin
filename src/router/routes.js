@@ -1,9 +1,20 @@
+import MainLayout from 'layouts/MainLayout.vue'
+
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: MainLayout,
     children: [
-      { path: '', component: () => import('pages/IndexPage.vue') }
+      {
+        path: 'wordforms',
+        component: () => import('pages/WordformsPage.vue'),
+        meta: { pageTitle: 'Wordforms' }
+      },
+      {
+        path: 'sets',
+        component: () => import('pages/SetsPage.vue'),
+        meta: { pageTitle: 'Sets' }
+      }
     ]
   },
 

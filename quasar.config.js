@@ -17,8 +17,8 @@ module.exports = configure(function (/* ctx */) {
       // include: [],
       // exclude: [],
       // rawOptions: {},
-      warnings: true,
-      errors: true
+      // warnings: true,
+      // errors: true
     },
 
     // https://v2.quasar.dev/quasar-cli/prefetch-feature
@@ -28,7 +28,7 @@ module.exports = configure(function (/* ctx */) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
-
+      'global_components'
     ],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#css
@@ -57,7 +57,7 @@ module.exports = configure(function (/* ctx */) {
         node: 'node16'
       },
 
-      vueRouterMode: 'hash' // available values: 'hash', 'history'
+      vueRouterMode: 'history' // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
       // vueOptionsAPI: false,
