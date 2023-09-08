@@ -11,9 +11,29 @@ const routes = [
         meta: { pageTitle: 'Wordforms' }
       },
       {
+        path: 'wordform-:wordform_id',
+        component: () => import('pages/WordformPage.vue'),
+        meta: { pageTitle: 'Wordform' }
+      },
+      {
         path: 'sets',
         component: () => import('pages/SetsPage.vue'),
         meta: { pageTitle: 'Sets' }
+      },
+      {
+        path: 'set-:set_id',
+        component: () => import('pages/SetsPage.vue'),
+        meta: { pageTitle: 'Set' }
+      },
+      {
+        path: 'lemmas',
+        component: () => import('pages/LemmasPage.vue'),
+        meta: { pageTitle: 'Lemmas' }
+      },
+      {
+        path: 'lemma-:lemma_id',
+        component: () => import('pages/LemmaPage.vue'),
+        meta: { pageTitle: 'Lemma' }
       }
     ]
   },

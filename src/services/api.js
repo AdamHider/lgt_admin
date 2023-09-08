@@ -49,11 +49,14 @@ export class ApiService {
 
 export class Api extends ApiService{
     wordform = {
+        getItem: (params) => {
+            return this.post('wordform', 'getItem', params)
+        },
         getList: (params) => {
             return this.post('wordform', 'getList', params)
         },
-        getTotalRows: () => {
-            return this.post('wordform', 'getTotalRows', {})
+        getTotalRows: (params) => {
+            return this.post('wordform', 'getTotalRows', params)
         }
     }
     quest = {

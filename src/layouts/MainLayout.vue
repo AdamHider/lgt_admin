@@ -62,6 +62,12 @@ const menuList = [
   },
   {
     icon: 'format_size',
+    label: 'Lemmas',
+    link: 'lemmas',
+    separator: false
+  },
+  {
+    icon: 'format_size',
     label: 'Sets',
     link: 'sets',
     separator: true
