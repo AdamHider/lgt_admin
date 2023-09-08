@@ -3,7 +3,7 @@
     <q-card flat bordered class="my-card">
       <q-card-section>
         <div class="text-h6">{{ wordform.wordform }}</div>
-        <div class="text-subtitle2">Origin:
+        <div class="text-subtitle2">
           <router-link :to="`/lemma-${wordform.word_id}`">
             {{ wordform.word }}
           </router-link>
@@ -11,16 +11,16 @@
       </q-card-section>
 
       <q-card-section class="q-pt-none">
-        <q-list bordered separator>
-          <q-item clickable v-ripple v-for="(omonym, omonymIndex) in wordform.omonyms" :key="omonymIndex">
-            <q-item-section>{{ omonym.wordform }}</q-item-section>
-            <q-item-section>{{ omonym.word }}</q-item-section>
-          </q-item>
-        </q-list>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua.
       </q-card-section>
 
       <q-separator inset />
 
+      <q-card-section>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua.
+      </q-card-section>
     </q-card>
   </q-page>
 </template>

@@ -73,8 +73,9 @@ const menuList = [
     separator: true
   },
   {
-    icon: 'delete',
-    label: 'Trash',
+    icon: 'notes',
+    label: 'Sentence',
+    link: 'sentence',
     separator: false
   },
   {

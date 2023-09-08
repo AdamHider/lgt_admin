@@ -34,6 +34,11 @@ const routes = [
         path: 'lemma-:lemma_id',
         component: () => import('pages/LemmaPage.vue'),
         meta: { pageTitle: 'Lemma' }
+      },
+      {
+        path: 'sentence',
+        component: () => import('pages/SentencePage.vue'),
+        meta: { pageTitle: 'Sentence' }
       }
     ]
   },
