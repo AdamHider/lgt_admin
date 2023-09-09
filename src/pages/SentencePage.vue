@@ -26,6 +26,36 @@
         </q-btn>
       </q-card-actions>
     </q-card>
+
+    <q-list bordered class="rounded-borders">
+      <q-expansion-item
+        v-for="(sentenceAnalysisItem, sentenceAnalysisIndex) in sentenceAnalysis" :key="sentenceAnalysisIndex"
+        expand-separator
+        caption="John Doe"
+      >
+       <template v-slot:header>
+          <q-item-section avatar >
+            <q-icon v-if="sentenceAnalysisItem.matches.length !== 1" name="info" color="amber" />
+            <q-icon v-else name="check_circle" color="positive" />
+          </q-item-section>
+          <q-item-section>
+            {{ sentenceAnalysisItem.word }}
+          </q-item-section>
+          <q-item-section side>
+            <q-badge rounded :color="(sentenceAnalysisItem.matches.length !== 1) ? 'red' : 'primary'" :label="sentenceAnalysisItem.matches.length" />
+          </q-item-section>
+        </template>
+        <q-card>
+          <q-card-section>
+            <q-list bordered class="rounded-borders">
+              <q-item clickable v-ripple v-for="(match, matchIndex) in sentenceAnalysisItem.matches" :key="matchIndex">
+                <q-item-section>{{ match.target_wordform }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+    </q-list>
   </q-page>
 </template>
 
@@ -35,7 +65,6 @@ import { useRoute } from 'vue-router'
 import { ref, reactive, onActivated, onMounted } from 'vue'
 
 const route = useRoute()
-const wordform = ref({})
 const data = reactive({
   sourceText: 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
   targetText: 'Когда я была ребенком, у моей бабушки был небольшой жестяной сундучок, выкрашенный синe-изумрудными полосками, c декоративными выпуклостями, изображающими уголки-ковки, как у больших деревянных сундуков.'
