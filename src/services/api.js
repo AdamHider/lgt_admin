@@ -60,9 +60,12 @@ export class Api extends ApiService{
         }
     }
     sentence = {
-      analyze: (params) => {
+        analyze: (params) => {
             return this.post('sentence', 'analyze', params)
         },
+        save: (params) => {
+              return this.post('sentence', 'saveRelations', params)
+          },
     }
     homework = {
         getItem: (params) => {
