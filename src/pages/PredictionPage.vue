@@ -4,16 +4,32 @@
       <q-card-section horizontal>
         <q-card-section class="full-width">
           <div class="text-h6">Source Text</div>
+          <q-select
+            filled
+            v-model="data.source.language_id"
+            :options="options"
+            emit-value
+            map-options
+            label="Language"
+          />
           <q-input
-            v-model="data.sourceText"
+            v-model="data.source.text"
             outlined
             type="textarea"
           />
         </q-card-section>
         <q-card-section  class="full-width">
           <div class="text-h6">Target text</div>
+          <q-select
+            filled
+            v-model="data.target.language_id"
+            :options="options"
+            emit-value
+            map-options
+            label="Language"
+          />
             <q-input
-              v-model="translation"
+              v-model="data.target.text"
               outlined
               type="textarea"
             />
@@ -31,20 +47,42 @@
 
 <script setup >
 import { api } from '../services/index'
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 
+const options = [
+  {
+    label: 'Qirimtatar',
+    value: 1
+  },
+  {
+    label: 'Русский',
+    value: 2
+  }
+]
 const data = reactive({
-  sourceText: 'Şimdi bunı yapam' // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
+  source: {
+    text: 'Şimdi bunı yapam', // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
+    language_id: 1
+  },
+  target: {
+    text: '',
+    language_id: 2
+  }
 })
-const translation = ref('')
 
 const predict = async function () {
-  const translationResponse = await api.translator.predict({ text: data.sourceText })
+  const translationResponse = await api.translator.predict(data)
   if (translationResponse.error) {
     translationResponse.value = ''
     return
   }
-  translation.value = translationResponse.text
+  data.target.text = translationResponse.text
 }
+
+watch(() => data.source.language_id, async (currentValue, oldValue) => {
+  if (data.source.language_id === data.target.language_id) {
+    data.target.language_id = oldValue
+  }
+})
 
 </script>

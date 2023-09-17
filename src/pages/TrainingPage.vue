@@ -4,16 +4,32 @@
       <q-card-section horizontal>
         <q-card-section class="full-width">
           <div class="text-h6">Source Text</div>
+          <q-select
+            filled
+            v-model="data.source.language_id"
+            :options="options"
+            emit-value
+            map-options
+            label="Language"
+          />
           <q-input
-            v-model="data.sourceText"
+            v-model="data.source.text"
             outlined
             type="textarea"
           />
         </q-card-section>
         <q-card-section  class="full-width">
           <div class="text-h6">Target text</div>
+          <q-select
+            filled
+            v-model="data.target.language_id"
+            :options="options"
+            label="Language"
+            emit-value
+            map-options
+          />
             <q-input
-              v-model="data.targetText"
+              v-model="data.target.text"
               outlined
               type="textarea"
             />
@@ -73,17 +89,32 @@
 
 <script setup >
 import { api } from '../services/index'
-import { ref, reactive } from 'vue'
-
+import { ref, reactive, watch } from 'vue'
+const options = [
+  {
+    label: 'Qirimtatar',
+    value: 1
+  },
+  {
+    label: 'Русский',
+    value: 2
+  }
+]
 const data = reactive({
-  sourceText: 'Şimdi bunı yapam', // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
-  targetText: 'Я сейчас это делаю' // 'Когда я была ребенком, у моей бабушки был небольшой жестяной сундучок, выкрашенный синe-изумрудными полосками, c декоративными выпуклостями, изображающими уголки-ковки, как у больших деревянных сундуков.'
+  source: {
+    text: 'Şimdi bunı yapam', // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
+    language_id: 1
+  },
+  target: {
+    text: 'Я сейчас это делаю', // 'Когда я была ребенком, у моей бабушки был небольшой жестяной сундучок, выкрашенный синe-изумрудными полосками, c декоративными выпуклостями, изображающими уголки-ковки, как у больших деревянных сундуков.'
+    language_id: 2
+  }
 })
 const trainingAnalysis = ref({})
 const activeToken = ref(null)
 
 const analyze = async function () {
-  const trainingAnalysisResponse = await api.translator.analyze({ source: data.sourceText, target: data.targetText })
+  const trainingAnalysisResponse = await api.translator.analyze(data)
   if (trainingAnalysisResponse.error) {
     trainingAnalysis.value = {}
     return
@@ -109,10 +140,16 @@ const relate = function (targetIndex) {
   }
 }
 const train = async function () {
-  const trainingAnalysisSaveResponse = await api.sentence.train(trainingAnalysis.value)
+  const trainingAnalysisSaveResponse = await api.translator.train(trainingAnalysis.value)
   if (trainingAnalysisSaveResponse.error) {
     trainingAnalysis.value = {}
   }
 }
+
+watch(() => data.source.language_id, async (currentValue, oldValue) => {
+  if (data.source.language_id === data.target.language_id) {
+    data.target.language_id = oldValue
+  }
+})
 
 </script>
