@@ -74,13 +74,14 @@ const menuList = [
   },
   {
     icon: 'notes',
-    label: 'Sentence',
-    link: 'sentence',
+    label: 'Training',
+    link: 'training',
     separator: false
   },
   {
     icon: 'error',
-    label: 'Spam',
+    label: 'Prediction',
+    link: 'prediction',
     separator: true
   },
   {

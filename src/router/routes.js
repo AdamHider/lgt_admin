@@ -36,9 +36,14 @@ const routes = [
         meta: { pageTitle: 'Lemma' }
       },
       {
-        path: 'sentence',
-        component: () => import('pages/SentencePage.vue'),
-        meta: { pageTitle: 'Sentence' }
+        path: 'training',
+        component: () => import('pages/TrainingPage.vue'),
+        meta: { pageTitle: 'Training' }
+      },
+      {
+        path: 'prediction',
+        component: () => import('pages/PredictionPage.vue'),
+        meta: { pageTitle: 'Prediction' }
       }
     ]
   },
