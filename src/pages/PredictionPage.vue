@@ -11,10 +11,12 @@
             emit-value
             map-options
             label="Language"
+            class="q-my-sm"
           />
           <q-input
             v-model="data.source.text"
             outlined
+            clearable
             type="textarea"
           />
         </q-card-section>
@@ -27,10 +29,12 @@
             emit-value
             map-options
             label="Language"
+            class="q-my-sm"
           />
             <q-input
               v-model="data.target.text"
-              outlined
+              filled
+              readonly
               type="textarea"
             />
         </q-card-section>
