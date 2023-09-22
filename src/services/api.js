@@ -70,4 +70,9 @@ export class Api extends ApiService{
             return this.post('translator', 'predict', params)
         },
     }
+    sentence = {
+        getPair: (params) => {
+            return this.post('sentence', 'getPair', params)
+        },
+    }
 }

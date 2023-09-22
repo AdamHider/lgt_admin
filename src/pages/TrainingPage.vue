@@ -130,7 +130,7 @@
 
 <script setup >
 import { api } from '../services/index'
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, onMounted } from 'vue'
 const options = [
   {
     label: 'Qirimtatar',
@@ -141,7 +141,7 @@ const options = [
     value: 2
   }
 ]
-const data = reactive({
+const data = ref({
   source: {
     text: 'Şimdi bunı yapam', // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
     language_id: 1
@@ -153,6 +153,15 @@ const data = reactive({
 })
 const trainingAnalysis = ref({})
 const activeMatchGroup = ref(null)
+
+const loadData = async function () {
+  const sentencePairResponse = await api.sentence.getPair()
+  if (sentencePairResponse.error) {
+    data.value = {}
+    return
+  }
+  data.value = sentencePairResponse
+}
 
 const analyze = async function () {
   const trainingAnalysisResponse = await api.translator.analyze(data)
@@ -207,8 +216,8 @@ const deleteGroup = function (groupIndex) {
 }
 const createGroup = function () {
   const group = {}
-  group[data.source.language_id] = { neurons: [], isFixedPosition: false }
-  group[data.target.language_id] = { neurons: [], isFixedPosition: false }
+  group[data.value.source.language_id] = { neurons: [], isFixedPosition: false }
+  group[data.value.target.language_id] = { neurons: [], isFixedPosition: false }
   return trainingAnalysis.value.matches.push(group)
 }
 const train = async function () {
@@ -216,10 +225,14 @@ const train = async function () {
   trainingAnalysis.value = {}
 }
 
-watch(() => data.source.language_id, async (currentValue, oldValue) => {
-  if (data.source.language_id === data.target.language_id) {
-    data.target.language_id = oldValue
+watch(() => data.value.source.language_id, async (currentValue, oldValue) => {
+  if (data.value.source.language_id === data.value.target.language_id) {
+    data.value.target.language_id = oldValue
   }
+})
+onMounted(async () => {
+  // get initial data from server (1st page)
+  await loadData()
 })
 
 </script>
