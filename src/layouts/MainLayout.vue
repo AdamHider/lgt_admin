@@ -85,8 +85,9 @@ const menuList = [
     separator: true
   },
   {
-    icon: 'settings',
-    label: 'Settings',
+    icon: 'share',
+    label: 'Text Compare',
+    link: 'text-compare',
     separator: false
   },
   {

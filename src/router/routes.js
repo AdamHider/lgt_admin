@@ -44,6 +44,11 @@ const routes = [
         path: 'prediction',
         component: () => import('pages/PredictionPage.vue'),
         meta: { pageTitle: 'Prediction' }
+      },
+      {
+        path: 'text-compare',
+        component: () => import('pages/TextComparePage.vue'),
+        meta: { pageTitle: 'TextCompare' }
       }
     ]
   },

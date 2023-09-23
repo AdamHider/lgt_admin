@@ -75,4 +75,28 @@ export class Api extends ApiService{
             return this.post('sentence', 'getPair', params)
         },
     }
+    book = {
+        getItem: (params) => {
+            return this.post('book', 'getItem', params)
+        },
+        getList: (params) => {
+            return this.post('book', 'getList', params)
+        }
+    }
+    chapter = {
+        getItem: (params) => {
+            return this.post('chapter', 'getItem', params)
+        },
+        getList: (params) => {
+            return this.post('chapter', 'getList', params)
+        }
+    }
+    text = {
+        getItem: (params) => {
+            return this.post('text', 'getItem', params)
+        },
+        getList: (params) => {
+            return this.post('text', 'getList', params)
+        }
+    }
 }
