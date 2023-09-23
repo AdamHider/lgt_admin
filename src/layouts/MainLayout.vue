@@ -85,14 +85,9 @@ const menuList = [
     separator: true
   },
   {
-    icon: 'share',
-    label: 'Text Compare',
-    link: 'text-compare',
-    separator: false
-  },
-  {
-    icon: 'feedback',
-    label: 'Send Feedback',
+    icon: 'menu_book',
+    label: 'Books',
+    link: 'books',
     separator: false
   },
   {

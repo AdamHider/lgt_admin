@@ -2,34 +2,18 @@
   <q-page class="bg-white q-pa-sm">
     <q-card flat bordered class="q-my-sm">
       <q-card-section>
-        <q-select
-          filled
-          v-model="data.heading"
-          :options="bookOptions"
-          use-input
-          input-debounce="0"
-          @filter="filterBooks"
-          option-value="id"
-          option-label="title"
-          label="Standard"
-          color="teal"
-          clearable
-          options-selected-class="text-deep-orange"
-        >
-          <template v-slot:option="scope">
-            <q-item v-bind="scope.itemProps">
-              <q-item-section>
-                <q-item-label>{{ scope.opt.title }}</q-item-label>
-                <q-item-label caption>{{ scope.opt.author }}</q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
-        </q-select>
-        <div class="q-gutter-md">
-          <q-input outlined v-model="data.heading.title" label="Title" />
-          <q-input outlined v-model="data.heading.author" label="Author" />
-          <q-input outlined v-model="data.heading.year" label="Year" />
-          <q-input outlined v-model="data.heading.chapter" label="Chapter" />
+        <div class="q-gutter-md q-my-sm  row items-start">
+          <q-select v-if="chapters.length > 0"
+            outlined q-select v-model="data.heading.chapter"
+            option-value="id"
+            option-label="number"
+            :options="chapters"
+            label="Chapter"
+            style="min-width: 300px"
+            >
+          </q-select>
+          <q-btn outline color="primary" label="New chapter" @click="addChapter()"/>
+
         </div>
       </q-card-section>
       <q-card-section horizontal>
@@ -38,7 +22,7 @@
           <q-select
             filled
             v-model="data.body.source.language_id"
-            :options="options"
+            :options="options.source"
             emit-value
             map-options
             label="Language"
@@ -51,7 +35,7 @@
           <q-select
             filled
             v-model="data.body.target.language_id"
-            :options="options"
+            :options="options.target"
             label="Language"
             emit-value
             map-options
@@ -73,31 +57,38 @@
 <script setup >
 import { api } from '../services/index'
 import { ref, reactive, watch, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
 
 import NotepadTextarea from '../components/NotepadTextarea.vue'
 
-const formData = reactive({
-  bookTitle: ''
-})
-
-const bookOptions = ref([])
-const options = [
-  {
-    label: 'Qirimtatar',
-    value: 1
-  },
-  {
-    label: 'Русский',
-    value: 2
-  }
-]
+const chapters = ref([])
+const options = {
+  source: [
+    {
+      label: 'Qirimtatar',
+      value: 1
+    }
+  ],
+  target: [
+    {
+      label: 'Русский',
+      value: 2
+    },
+    {
+      label: 'Украинська',
+      value: 3
+    },
+    {
+      label: 'English',
+      value: 4
+    }
+  ]
+}
 const data = ref({
   heading: {
-    code: '',
-    title: '',
-    author: '',
-    year: '',
-    chapter: 1
+    chapter: 0
   },
   body: {
     source: {
@@ -112,10 +103,8 @@ const data = ref({
     }
   }
 })
-const trainingAnalysis = ref({})
-const activeMatchGroup = ref(null)
 
-const loadData = async function () {
+const saveData = async function () {
   const sentencePairResponse = await api.sentence.getPair()
   if (sentencePairResponse.error) {
     data.value = {}
@@ -123,19 +112,24 @@ const loadData = async function () {
   }
   data.value = sentencePairResponse
 }
-
-const filterBooks = function (val, update, abort) {
-  // call abort() at any time if you can't retrieve data somehow
-  loadBooks(val, update)
-}
-const loadBooks = async function (val, update) {
-  const bookListResponse = await api.book.getList({ filter: val })
-  if (bookListResponse.error) {
-    bookOptions.value = {}
+async function loadChapters () {
+  const chapterListResponse = await api.chapter.getList({ book_id: route.params.book_id })
+  if (chapterListResponse.error) {
+    chapters.value = []
+    return []
   }
-  update(() => {
-    bookOptions.value = bookListResponse
-  })
+  chapters.value = chapterListResponse
+}
+const addChapter = async function () {
+  const chapterAddResponse = await api.chapter.createItem({ book_id: route.params.book_id, number: chapters.value.length + 1 })
+  if (chapterAddResponse.error) {
+    chapterAddResponse.value = []
+  }
+  return await loadChapters()
 }
 
+onMounted(async () => {
+  // get initial data from server (1st page)
+  await loadChapters()
+})
 </script>

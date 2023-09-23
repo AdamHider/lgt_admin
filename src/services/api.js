@@ -81,7 +81,10 @@ export class Api extends ApiService{
         },
         getList: (params) => {
             return this.post('book', 'getList', params)
-        }
+        },
+        createItem: (params) => {
+            return this.post('book', 'createItem', params)
+        },
     }
     chapter = {
         getItem: (params) => {
@@ -89,6 +92,9 @@ export class Api extends ApiService{
         },
         getList: (params) => {
             return this.post('chapter', 'getList', params)
+        },
+        createItem: (params) => {
+            return this.post('chapter', 'createItem', params)
         }
     }
     text = {
@@ -97,6 +103,9 @@ export class Api extends ApiService{
         },
         getList: (params) => {
             return this.post('text', 'getList', params)
+        },
+        createItem: (params) => {
+            return this.post('text', 'createItem', params)
         }
     }
 }
