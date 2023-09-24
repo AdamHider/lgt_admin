@@ -8,50 +8,64 @@
         <div class="text-caption text-grey">{{ book.year }}</div>
 
       <q-btn color="primary" icon="add" label="Open editor" @click="textModal = !textModal"></q-btn>
+      <q-btn flat color="primary" @click="exportTexts()">Export</q-btn>
       </q-card-section>
     </q-card>
     <q-dialog v-model="textModal"
       persistent
       maximized>
         <q-card class="my-card">
-          <q-toolbar>
-            <q-select
-              filled
-              v-model="data.source.language_id"
-              :options="options.source"
-              emit-value
-              map-options
-              label="Source Language"
-            />
-            <q-select
-              filled
-              v-model="data.target.language_id"
-              :options="options.target"
-              label="Target Language"
-              emit-value
-              map-options
-            />
+          <q-bar>
+            <q-btn flat icon="save" color="primary" @click="saveTexts()">
+                Save
+              </q-btn>
+              <q-spinner
+                v-if="saving"
+                color="primary"
+              />
+            <q-space />
+              <q-btn flat round dense icon="close" v-close-popup />
+          </q-bar>
 
-            <q-toolbar-title>
-
-            </q-toolbar-title>
-
-            <q-btn flat color="primary" @click="saveTexts()">
-              Save
-            </q-btn>
-            <q-spinner
-              v-if="saving"
-              color="primary"
-            />
-            <q-btn flat round dense icon="close" v-close-popup />
-          </q-toolbar>
+          <div class="row q-px-sm">
+            <div class="col-6 row">
+              <q-select
+                dense
+                v-model="data.source.language_id"
+                :options="options.source"
+                emit-value
+                map-options
+              />
+              <q-toggle
+                label="Ready"
+                v-model="data.source.is_done"
+                :false-value="null"
+                :true-value="'1'"
+              />
+            </div>
+            <div class="col-6 row">
+              <q-select
+                dense
+                v-model="data.target.language_id"
+                :options="options.target"
+                emit-value
+                map-options
+              />
+              <q-toggle
+                label="Ready"
+                v-model="data.target.is_done"
+                :false-value="null"
+                :true-value="'1'"
+              />
+            </div>
+          </div>
 
           <q-card-section horizontal>
             <q-card-section class="full-width q-pa-none">
-              <NotepadTextarea :value="data.source.text" @update-value="data.source.text = $event;"/>
+              <NotepadTextarea :value="data.source.text" :scrollSync="scrollSync" @update-value="data.source.text = $event;" @update-scroll="scrollSync = $event;"/>
             </q-card-section>
             <q-card-section  class="full-width q-pa-none">
-              <NotepadTextarea :value="data.target.text" @update-value="data.target.text = $event;"/>
+              <NotepadTextarea :value="data.target.text" :scrollSync="scrollSync" @update-value="data.target.text = $event;" @update-scroll="scrollSync = $event;"/>
             </q-card-section>
           </q-card-section>
           <q-inner-loading :showing="!loaded">
@@ -96,6 +110,7 @@ const options = {
   ]
 }
 
+const scrollSync = ref({})
 const error = ref(false)
 const loaded = ref(false)
 const saving = ref(false)
@@ -109,11 +124,13 @@ const data = reactive({
 
   source: {
     text: '',
-    language_id: '1'
+    language_id: '1',
+    is_done: false
   },
   target: {
     text: '',
-    language_id: '2'
+    language_id: '2',
+    is_done: false
   }
 })
 
@@ -145,11 +162,26 @@ const saveTexts = async function () {
   await saveText('target')
   saving.value = false
 }
+const exportTexts = async function () {
+  api.text.exportItem({
+    chapter_id: route.params.chapter_id,
+    language_id: data.source.language_id,
+    text: data.source.text,
+    is_done: data.source.is_done
+  })
+  api.text.exportItem({
+    chapter_id: route.params.chapter_id,
+    language_id: data.target.language_id,
+    text: data.target.text,
+    is_done: data.target.is_done
+  })
+}
 const saveText = async function (scope) {
   await api.text.saveItem({
     chapter_id: route.params.chapter_id,
     language_id: data[scope].language_id,
-    text: data[scope].text
+    text: data[scope].text,
+    is_done: data[scope].is_done
   })
 }
 const saveCounter = function () {

@@ -107,6 +107,10 @@ export class Api extends ApiService{
         saveItem: (params) => {
             return this.post('text', 'saveItem', params)
         },
-        
+        exportItem: (params) => {
+            return this.post('text', 'exportItem', params)
+        },
+
+
     }
 }
