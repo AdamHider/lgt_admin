@@ -4,22 +4,18 @@
 }
 </style>
 <template>
-  <q-card class="q-pa-sm">
-    <q-card-section>
-      <q-btn color="primary" icon="add" label="New book" @click="addModal = !addModal"></q-btn>
-    </q-card-section>
-  </q-card>
-  <q-card class="q-pa-sm">
-    <q-card-section>
+  <q-card flat class="q-pa-sm q-my-sm">
+    <q-card-actions>
+      <q-btn color="primary" icon="add" label="New book" @click="bookModal = !bookModal"></q-btn>
       <q-input borderless dense v-model="filterSet.filter" label="Search book ..." >
           <template v-slot:append>
             <q-icon v-if="filterSet.filter !== ''" name="close" @click="filterSet.filter = ''" class="cursor-pointer" />
             <q-icon name="search" />
           </template>
         </q-input>
-      </q-card-section>
+    </q-card-actions>
   </q-card>
-  <q-dialog v-model="addModal">
+  <q-dialog v-model="bookModal">
         <q-card class="my-card">
           <q-card-section>
             <q-input outlined v-model="formData.title" label="Title" />
@@ -34,28 +30,34 @@
         </q-card>
       </q-dialog>
   <div>
-    <q-list bordered dense padding class="rounded-borders" v-for="(book, bookIndex) in books" :key="bookIndex">
-      <q-item >
-        <q-item-section avatar top>
-          <q-icon name="import_contacts" color="black" size="34px" />
-        </q-item-section>
-        <q-item-section top>
-          <q-item-label lines="1">
-            <span class="text-weight-medium">{{book.title}}</span>
-          </q-item-label>
-          <q-item-label lines="1">
-            <span class="text-grey-8">{{book.author}} ({{book.year}})</span>
-          </q-item-label>
-          <q-item-label caption lines="1">
-            Chapters: {{ book.chapters }}
-          </q-item-label>
-        </q-item-section>
-        <q-item-section top side>
-          <div class="text-grey-8 q-gutter-xs">
-            <q-btn class="gt-xs" size="12px" flat dense round icon="edit" :to="`/book-${book.id}`"  />
-          </div>
-        </q-item-section>
-      </q-item>
+    <q-list  bordered dense  >
+      <q-expansion-item
+        v-for="(book, bookIndex) in books" :key="bookIndex"
+        icon="book"
+        expand-separator
+        :label="book.title"
+        :caption="book.author"
+      >
+        <q-list dense class="q-pl-md">
+          <q-item clickable v-for="(chapter, chapterIndex) in book.chapters" :key="chapterIndex" :to="`/chapter-${chapter.id}`">
+            <q-item-section avatar top>
+              <q-avatar icon="subdirectory_arrow_right" />
+            </q-item-section>
+            <q-item-section>
+              Chapter {{chapter.number}}
+            </q-item-section>
+          </q-item>
+
+          <q-item clickable @click="addChapter(book.id, book.chapters.length+1)">
+            <q-item-section avatar top>
+              <q-avatar icon="add" />
+            </q-item-section>
+            <q-item-section>
+              New chapter
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-expansion-item>
     </q-list>
 
   </div>
@@ -67,7 +69,8 @@ import { ref, watch, onMounted, reactive } from 'vue'
 
 const error = ref({})
 const books = ref([])
-const addModal = ref(false)
+const bookModal = ref(false)
+const chapterModal = ref(false)
 const formData = reactive({
   title: '',
   author: '',
@@ -79,7 +82,7 @@ const filterSet = ref({
 })
 
 async function loadData () {
-  const bookListResponse = await api.book.getList({ filter: filterSet.value.filter })
+  const bookListResponse = await api.book.getList({ filter: { search: filterSet.value.filter } })
   if (bookListResponse.error) {
     error.value = bookListResponse
     return []
@@ -96,6 +99,13 @@ const addBook = async function () {
     bookAddResponse.value = []
   }
   return true
+}
+const addChapter = async function (book_id, number) {
+  const chapterAddResponse = await api.chapter.createItem({ book_id, number })
+  if (chapterAddResponse.error) {
+    chapterAddResponse.value = []
+  }
+  return await loadData()
 }
 
 onMounted(async () => {

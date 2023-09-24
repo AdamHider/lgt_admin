@@ -51,9 +51,9 @@ const routes = [
         meta: { pageTitle: 'Books' }
       },
       {
-        path: 'book-:book_id',
-        component: () => import('pages/BookPage.vue'),
-        meta: { pageTitle: 'Book' }
+        path: 'chapter-:chapter_id',
+        component: () => import('pages/ChapterPage.vue'),
+        meta: { pageTitle: 'Chapter' }
       }
     ]
   },
