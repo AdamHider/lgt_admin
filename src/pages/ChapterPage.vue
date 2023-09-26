@@ -6,9 +6,10 @@
         <div class="text-h5 q-mt-sm q-mb-xs">{{ book.title }}</div>
         <div class="text-h6 q-mt-sm q-mb-xs">Chapter {{ book.chapter }}</div>
         <div class="text-caption text-grey">{{ book.year }}</div>
-
-      <q-btn color="primary" icon="add" label="Open editor" @click="textModal = !textModal"></q-btn>
-      <q-btn flat color="primary" @click="exportTexts()">Export</q-btn>
+        <div class="row q-gutter-md">
+          <q-btn color="primary" icon="edit" label="Open editor" @click="textModal = !textModal"></q-btn>
+          <q-btn flate icon="trash" @click="deleteChapter()">Delete</q-btn>
+        </div>
       </q-card-section>
     </q-card>
     <q-dialog v-model="textModal"
@@ -16,15 +17,18 @@
       maximized>
         <q-card class="my-card">
           <q-bar>
-            <q-btn flat icon="save" color="primary" @click="saveTexts()">
-                Save
-              </q-btn>
-              <q-spinner
-                v-if="saving"
-                color="primary"
-              />
+            <q-btn flat icon="save" @click="saveTexts()">
+              Save
+            </q-btn>
+            <q-spinner
+              v-if="saving"
+              color="primary"
+            />
+            <q-btn flat icon="move_up" @click="exportTexts()">
+              Export
+            </q-btn>
             <q-space />
-              <q-btn flat round dense icon="close" v-close-popup />
+            <q-btn flat round dense icon="close" v-close-popup />
           </q-bar>
 
           <div class="row q-px-sm">
@@ -36,12 +40,9 @@
                 emit-value
                 map-options
               />
-              <q-toggle
-                label="Ready"
-                v-model="data.source.is_done"
-                :false-value="null"
-                :true-value="'1'"
-              />
+              <q-chip v-if="data.source.is_exported" size="md" icon="check" color="positive" text-color="white">
+                Exported
+              </q-chip>
             </div>
             <div class="col-6 row">
               <q-select
@@ -51,21 +52,22 @@
                 emit-value
                 map-options
               />
-              <q-toggle
-                label="Ready"
-                v-model="data.target.is_done"
-                :false-value="null"
-                :true-value="'1'"
-              />
+              <q-chip v-if="data.target.is_exported" size="md" icon="check" color="positive" text-color="white">
+                Exported
+              </q-chip>
             </div>
           </div>
 
           <q-card-section horizontal>
             <q-card-section class="full-width q-pa-none">
-              <NotepadTextarea :value="data.source.text" :scrollSync="scrollSync" @update-value="data.source.text = $event;" @update-scroll="scrollSync = $event;"/>
+              <NotepadTextarea :value="data.source.text" :scrollSync="scrollSync" :readonly="data.source.is_exported"
+                @update-value="data.source.text = $event;"
+                @update-scroll="scrollSync = $event;"/>
             </q-card-section>
             <q-card-section  class="full-width q-pa-none">
-              <NotepadTextarea :value="data.target.text" :scrollSync="scrollSync" @update-value="data.target.text = $event;" @update-scroll="scrollSync = $event;"/>
+              <NotepadTextarea :value="data.target.text" :scrollSync="scrollSync" :readonly="data.target.is_exported"
+                @update-value="data.target.text = $event;"
+                @update-scroll="scrollSync = $event;"/>
             </q-card-section>
           </q-card-section>
           <q-inner-loading :showing="!loaded">
@@ -80,7 +82,7 @@
 
 <script setup >
 import { api } from '../services/index'
-import { ref, reactive, watch, onMounted, onActivated } from 'vue'
+import { ref, reactive, watch, onMounted, onActivated, onDeactivated } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -125,12 +127,14 @@ const data = reactive({
   source: {
     text: '',
     language_id: '1',
-    is_done: false
+    is_done: false,
+    is_exported: false
   },
   target: {
     text: '',
     language_id: '2',
-    is_done: false
+    is_done: false,
+    is_exported: false
   }
 })
 
@@ -142,7 +146,9 @@ async function loadText (scope) {
   if (textListResponse.error) {
     data[scope] = {
       text: '',
-      language_id: data[scope].language_id
+      language_id: data[scope].language_id,
+      is_done: false,
+      is_exported: false
     }
     return []
   }
@@ -157,32 +163,48 @@ async function loadBook () {
   book.value = bookItemResponse
 }
 const saveTexts = async function () {
+  if (!route.params.chapter_id) return
   saving.value = true
   await saveText('source')
   await saveText('target')
   saving.value = false
 }
 const exportTexts = async function () {
-  api.text.exportItem({
+  await api.text.exportItem({
     chapter_id: route.params.chapter_id,
     language_id: data.source.language_id,
     text: data.source.text,
-    is_done: data.source.is_done
+    is_done: data.source.is_done,
+    is_exported: data.source.is_exported
   })
-  api.text.exportItem({
+  await api.text.exportItem({
     chapter_id: route.params.chapter_id,
     language_id: data.target.language_id,
     text: data.target.text,
-    is_done: data.target.is_done
+    is_done: data.target.is_done,
+    is_exported: data.target.is_exported
   })
+  loadData()
 }
 const saveText = async function (scope) {
   await api.text.saveItem({
     chapter_id: route.params.chapter_id,
     language_id: data[scope].language_id,
     text: data[scope].text,
-    is_done: data[scope].is_done
+    is_done: data[scope].is_done,
+    is_exported: data[scope].is_exported
   })
+}
+const loadData = async function () {
+  clearInterval(saveInterval.value)
+  loadBook()
+  loaded.value = false
+  await loadText('source')
+  await loadText('target')
+  loaded.value = true
+}
+const deleteChapter = async function () {
+  await api.chapter.deleteItem({ chapter_id: route.params.chapter_id })
 }
 const saveCounter = function () {
   saveInterval.value = setInterval(function () {
@@ -191,23 +213,14 @@ const saveCounter = function () {
 }
 
 onActivated(async () => {
-  loadBook()
-  loaded.value = false
-  await loadText('source')
-  await loadText('target')
-  loaded.value = true
+  await loadData()
+})
+onDeactivated(async () => {
   clearInterval(saveInterval.value)
-  saveCounter()
 })
 
 onMounted(async () => {
-  loadBook()
-  loaded.value = false
-  await loadText('source')
-  await loadText('target')
-  loaded.value = true
-  clearInterval(saveInterval.value)
-  saveCounter()
+  await loadData()
 })
 
 watch(() => data.source.language_id, async (currentValue, oldValue) => {

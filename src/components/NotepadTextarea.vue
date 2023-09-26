@@ -41,6 +41,7 @@
             <div class="shadow-text">{{ formData.text }}</div>
             <q-input
               borderless
+              :readonly="formData.readonly"
               v-model="formData.text"
               @update:model-value="countLines(); emits('update-value', formData.text)"
               type="textarea"
@@ -58,19 +59,23 @@ const emits = defineEmits(['update-value', 'update-scroll'])
 
 const props = defineProps({
   value: String,
+  readonly: Boolean,
   scrollSync: Object
 })
 const notepadScroll = ref(null)
 const formData = reactive({
   text: '',
-  totalLines: 1
+  totalLines: 1,
+  readonly: null
 })
 onMounted(() => {
   if (props.value) formData.text = props.value
+  if (props.value) formData.readonly = props.readonly
   countLines()
 })
 onActivated(() => {
   if (props.value) formData.text = props.value
+  if (props.value) formData.readonly = props.readonly
   countLines()
 })
 const onScroll = function (position) {
@@ -89,6 +94,9 @@ const countLines = function () {
 watch(() => props.value, async (currentValue, oldValue) => {
   formData.text = currentValue
   countLines()
+})
+watch(() => props.readonly, async (currentValue, oldValue) => {
+  formData.readonly = currentValue
 })
 watch(() => props.scrollSync, async (currentValue, oldValue) => {
   notepadScroll.value.setScrollPosition('vertical', currentValue.verticalPosition)

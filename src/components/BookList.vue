@@ -46,6 +46,13 @@
             <q-item-section>
               Chapter {{chapter.number}}
             </q-item-section>
+
+            <q-item-section side>
+              <q-chip color="primary" text-color="white" size="sm">{{ chapter.total_texts }}</q-chip>
+            </q-item-section>
+            <q-item-section side v-if="chapter.is_exported == 1">
+              <b class="text-positive">Exported</b>
+            </q-item-section>
           </q-item>
 
           <q-item clickable @click="addChapter(book.id, book.chapters.length+1)">
