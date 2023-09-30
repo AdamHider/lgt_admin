@@ -74,6 +74,9 @@ export class Api extends ApiService{
         getPair: (params) => {
             return this.post('sentence', 'getPair', params)
         },
+        setTrained: (params) => {
+            return this.post('sentence', 'setTrained', params)
+        },
     }
     book = {
         getItem: (params) => {

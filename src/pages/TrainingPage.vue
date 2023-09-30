@@ -74,7 +74,7 @@
         </q-card-section>
       </q-card-section>
       <q-card-section v-if="activeMatchGroup != null" >
-        <q-btn class="full-width" icon="done" color="positive" label="Confirm" @click="activeMatchGroup = null"  />
+        <q-btn :disable="!activeMatchGroupIsCompleted" class="full-width" icon="done" color="positive" label="Confirm" @click="activeMatchGroup = null"  />
       </q-card-section>
 
       <q-card-section>
@@ -143,28 +143,34 @@ const options = [
 ]
 const data = ref({
   source: {
+    id: 0,
     text: 'Şimdi bunı yapam', // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
     language_id: 1
   },
   target: {
+    id: 0,
     text: 'Я сейчас это делаю', // 'Когда я была ребенком, у моей бабушки был небольшой жестяной сундучок, выкрашенный синe-изумрудными полосками, c декоративными выпуклостями, изображающими уголки-ковки, как у больших деревянных сундуков.'
     language_id: 2
   }
 })
 const trainingAnalysis = ref({})
 const activeMatchGroup = ref(null)
+const activeMatchGroupIsCompleted = ref(false)
 
 const loadData = async function () {
-  const sentencePairResponse = await api.sentence.getPair()
+  const sentencePairResponse = await api.sentence.getPair({ source_language_id: data.value.source.language_id, target_language_id: data.value.target.language_id })
   if (sentencePairResponse.error) {
     data.value = {}
     return
   }
-  data.value = sentencePairResponse
+  data.value.source.id = sentencePairResponse.source_id
+  data.value.source.text = sentencePairResponse.source_text
+  data.value.target.id = sentencePairResponse.target_id
+  data.value.target.text = sentencePairResponse.target_text
 }
 
 const analyze = async function () {
-  const trainingAnalysisResponse = await api.translator.analyze(data)
+  const trainingAnalysisResponse = await api.translator.analyze({ source: data.value.source, target: data.value.target })
   if (trainingAnalysisResponse.error) {
     trainingAnalysis.value = {}
     return
@@ -189,6 +195,12 @@ const relate = function (tokenIndex, languageId) {
       }
     }
     trainingAnalysis.value.matches[activeMatchGroup.value][languageId].neurons = matches
+  }
+  if (trainingAnalysis.value.matches[activeMatchGroup.value][data.value.source.language_id].neurons.length > 0 &&
+      trainingAnalysis.value.matches[activeMatchGroup.value][data.value.target.language_id].neurons.length > 0) {
+    activeMatchGroupIsCompleted.value = true
+  } else {
+    activeMatchGroupIsCompleted.value = false
   }
 }
 const setActiveGroup = function (tokenIndex, languageId) {
@@ -221,8 +233,15 @@ const createGroup = function () {
   return trainingAnalysis.value.matches.push(group)
 }
 const train = async function () {
-  await api.translator.train(trainingAnalysis.value)
-  trainingAnalysis.value = {}
+  trainingAnalysis.value.source_id = data.value.source.id
+  trainingAnalysis.value.target_id = data.value.target.id
+  const isTrained = await api.translator.train(trainingAnalysis.value)
+  if (isTrained) {
+    trainingAnalysis.value = {}
+    await api.sentence.setTrained({ id: data.value.source.id })
+    await api.sentence.setTrained({ id: data.value.target.id })
+  }
+  await loadData()
 }
 
 watch(() => data.value.source.language_id, async (currentValue, oldValue) => {
