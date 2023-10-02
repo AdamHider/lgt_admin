@@ -164,7 +164,7 @@ const loadData = async function () {
 }
 
 const analyze = async function () {
-  const trainingAnalysisResponse = await api.translator.analyze(data)
+  const trainingAnalysisResponse = await api.translator.analyze(data.value)
   if (trainingAnalysisResponse.error) {
     trainingAnalysis.value = {}
     return
@@ -232,7 +232,7 @@ watch(() => data.value.source.language_id, async (currentValue, oldValue) => {
 })
 onMounted(async () => {
   // get initial data from server (1st page)
-  await loadData()
+  // await loadData()
 })
 
 </script>
