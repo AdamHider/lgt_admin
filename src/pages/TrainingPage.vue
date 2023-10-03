@@ -170,7 +170,7 @@ const loadData = async function () {
 }
 
 const analyze = async function () {
-  const trainingAnalysisResponse = await api.translator.analyze(data)
+  const trainingAnalysisResponse = await api.translator.analyze(data.value)
   if (trainingAnalysisResponse.error) {
     trainingAnalysis.value = {}
     return
