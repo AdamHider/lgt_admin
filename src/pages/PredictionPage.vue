@@ -61,7 +61,16 @@ const options = [
   {
     label: 'Русский',
     value: 2
+  },
+  {
+    label: 'English',
+    value: 4
+  },
+  {
+    label: 'French',
+    value: 5
   }
+
 ]
 const data = reactive({
   source: {

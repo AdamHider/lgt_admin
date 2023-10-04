@@ -40,6 +40,9 @@
         <q-btn flat color="primary" @click="analyze()">
           Analyze
         </q-btn>
+        <q-btn flat color="primary" @click="feed()">
+          Feed
+        </q-btn>
       </q-card-actions>
     </q-card>
     <q-card flat bordered class="q-my-sm" v-if="trainingAnalysis.matches">
@@ -176,6 +179,9 @@ const analyze = async function () {
     return
   }
   trainingAnalysis.value = trainingAnalysisResponse
+}
+const feed = async function () {
+  const feedResponse = await api.translator.feed(1)
 }
 const relate = function (tokenIndex, languageId) {
   if (tokenIndex === null || activeMatchGroup.value == null) return

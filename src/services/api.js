@@ -69,6 +69,9 @@ export class Api extends ApiService{
         predict: (params) => {
             return this.post('translator', 'predict', params)
         },
+        feed: (params) => {
+            return this.post('translator', 'feed', params)
+        },
     }
     sentence = {
         getPair: (params) => {
