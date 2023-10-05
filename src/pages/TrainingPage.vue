@@ -148,7 +148,7 @@ const data = ref({
   source: {
     id: 0,
     text: 'Şimdi bunı yapam', // 'Men bala ekende, qartanamnıñ küçük teneke sandıçığı olğanını hatırlayım. Şu mavı-zumrut renklerge boyalanğan qutuçıqnıñ üstü tıpqı balaban sandıqlarda kibi, dögme köşeçiklerinen yaraştırılğan edi.',
-    language_id: 1
+    language_id: 4
   },
   target: {
     id: 0,
